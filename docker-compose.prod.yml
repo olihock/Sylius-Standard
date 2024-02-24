@@ -12,7 +12,7 @@ services:
       APP_ENV: prod
       APP_SECRET: ${APP_SECRET:?APP_SECRET must be set}
       DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@sylius-standard-mysql/sylius_prod
-      MAILER_URL: gmail://oliver.hock@ithoc.de:${MAILER_PASSWORD:?MAILER_PASSWORD must be set}@integ.dynv6.net
+      MAILER_URL: gmail+smtp://oliver.hock@ithoc.de:${MAILER_PASSWORD}@default
       MESSENGER_TRANSPORT_DSN: doctrine://default
       SYLIUS_MESSENGER_TRANSPORT_MAIN_DSN: doctrine://default
       SYLIUS_MESSENGER_TRANSPORT_MAIN_FAILED_DSN: doctrine://default?queue_name=main_failed
