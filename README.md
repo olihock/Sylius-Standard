@@ -55,11 +55,14 @@ applied to the rest of the config.
 
 > When using a Virtual Private Server (VPS) we recommend having at least 2GB of RAM memory
 
-**Quick deploy:**
+**Docker installation:**
 ```bash
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
+```
 
+**Quick deploy:**
+```bash
 export MYSQL_PASSWORD=mysql_password
 export MAILER_PASSWORD=mailer_password
 export APP_SECRET=app_secret
@@ -70,13 +73,22 @@ docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml exec php bin/console sylius:fixtures:load --no-interaction
 ```
 
+**API usage:**
+1. Enable API in *config/packages/_sylius.yaml*:
+```yaml
+sylius_api:
+    enabled: true
+```
+2. Then execute:
+```bash
+docker compose -f docker-compose.prod.yml exec php bin/console lexik:jwt:generate-keypair
+```
 ## Troubleshooting
 
 If something goes wrong, errors & exceptions are logged at the application level:
 
 ```bash
-$ tail -f var/log/prod.log
-$ tail -f var/log/dev.log
+docker exec -it sylius-standard-php tail -f var/log/prod.log
 ```
 
 ## Contributing
