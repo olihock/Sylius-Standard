@@ -1,12 +1,12 @@
-<p align="center">
-    <a href="https://sylius.com" target="_blank">
-        <img src="https://demo.sylius.com/assets/shop/img/logo.png" />
+<p>
+    <a href="https://sylius.com" >
+        <img src="https://demo.sylius.com/assets/shop/img/logo.png" alt="Shop Logo"/>
     </a>
 </p>
 
-<h1 align="center">Sylius Standard Edition</h1>
+<h1>Sylius Standard Edition</h1>
 
-<p align="center">This is Sylius Standard Edition repository for starting new projects.</p>
+<p>This is Sylius Standard Edition repository for starting new projects.</p>
 
 ## About
 
@@ -60,8 +60,12 @@ applied to the rest of the config.
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
-export MYSQL_PASSWORD=SLyPJLaye7
+export MYSQL_PASSWORD=mysql_password
+export MAILER_PASSWORD=mailer_password
+export APP_SECRET=app_secret
+export NGINX_PORT=80
 
+docker compose -f docker-compose.prod.yml build --no-cache
 docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml exec php bin/console sylius:fixtures:load --no-interaction
 ```

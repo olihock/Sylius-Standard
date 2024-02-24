@@ -1,17 +1,18 @@
 services:
   php:
-    container_name: php
+    container_name: sylius-standard-php
     build:
       context: .
       target: sylius_php_prod
+    image: olihock/sylius-standard-php:1.12
     depends_on:
       - migrations
     environment:
       APP_DEBUG: 0
       APP_ENV: prod
-      APP_SECRET: EDITME
-      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@mysql/sylius_prod
-      MAILER_URL: smtp://localhost
+      APP_SECRET: ${APP_SECRET:?APP_SECRET must be set}
+      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@sylius-standard-mysql/sylius_prod
+      MAILER_URL: gmail://oliver.hock@ithoc.de:${MAILER_PASSWORD:?MAILER_PASSWORD must be set}@integ.dynv6.net
       MESSENGER_TRANSPORT_DSN: doctrine://default
       SYLIUS_MESSENGER_TRANSPORT_MAIN_DSN: doctrine://default
       SYLIUS_MESSENGER_TRANSPORT_MAIN_FAILED_DSN: doctrine://default?queue_name=main_failed
@@ -27,35 +28,37 @@ services:
       - sylius
 
   cron:
-    container_name: cron
+    container_name: sylius-standard-cron
     build:
       context: .
       target: sylius_cron
+    image: olihock/sylius-standard-cron:1.12
     depends_on:
       - migrations
     environment:
       APP_ENV: prod
       APP_DEBUG: 0
-      APP_SECRET: EDITME
-      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@mysql/sylius_prod
+      APP_SECRET: ${APP_SECRET:?APP_SECRET must be set}
+      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@sylius-standard-mysql/sylius_prod
       PHP_DATE_TIMEZONE: ${PHP_DATE_TIMEZONE:-UTC}
     networks:
       - sylius
 
   worker:
-    container_name: worker
+    container_name: sylius-standard-worker
     command: ["php", "bin/console", "messenger:consume", "main", "catalog_promotion_removal", "--limit=5", "--memory-limit=256M", "--time-limit=600"]
     restart: always
     build:
       context: .
       target: sylius_php_prod
+    image: olihock/sylius-standard-worker:1.12
     depends_on:
       - migrations
     environment:
       APP_ENV: prod
       APP_DEBUG: 0
-      APP_SECRET: EDITME
-      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@mysql/sylius_prod
+      APP_SECRET: ${APP_SECRET:?APP_SECRET must be set}
+      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@sylius-standard-mysql/sylius_prod
       MESSENGER_TRANSPORT_DSN: doctrine://default
       SYLIUS_MESSENGER_TRANSPORT_MAIN_DSN: doctrine://default
       SYLIUS_MESSENGER_TRANSPORT_MAIN_FAILED_DSN: doctrine://default?queue_name=main_failed
@@ -66,24 +69,25 @@ services:
       - sylius
 
   migrations:
-    container_name: migrations
+    container_name: sylius-standard-migrations
     build:
       context: .
       target: sylius_migrations_prod
+    image: olihock/sylius-standard-migrations:1.12
     depends_on:
       - mysql
     environment:
       APP_ENV: prod
       APP_DEBUG: 0
-      APP_SECRET: EDITME
-      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@mysql/sylius_prod
+      APP_SECRET: ${APP_SECRET:?APP_SECRET must be set}
+      DATABASE_URL: mysql://sylius:${MYSQL_PASSWORD}@sylius-standard-mysql/sylius_prod
       LOAD_FIXTURES: ${LOAD_FIXTURES:-0}
       PHP_DATE_TIMEZONE: ${PHP_DATE_TIMEZONE:-UTC}
     networks:
       - sylius
 
   mysql:
-    container_name: mysql
+    container_name: sylius-standard-mysql
     # in production, we may want to use a managed database service
     image: mysql:5.7 # Sylius is fully working on mysql 8.0 version
     environment:
@@ -98,11 +102,12 @@ services:
       - sylius
 
   nginx:
-    container_name: nginx
+    container_name: sylius-standard-nginx
     # in production, we may want to use a static website hosting service
     build:
       context: .
       target: sylius_nginx
+    image: olihock/sylius-standard-nginx:1.12
     depends_on:
       - php
     volumes:
@@ -111,7 +116,7 @@ services:
     networks:
       - sylius
     ports:
-      - 80:80
+      - "${NGINX_PORT:?NGINX_PORT must be set}:80"
 
 networks:
   sylius:
